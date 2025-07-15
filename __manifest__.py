@@ -23,13 +23,32 @@
         'views/question_views.xml', 
         'views/session_views.xml',
         'views/website_templates.xml',
+        'views/enhanced_website_templates.xml',
+        'views/sentence_completion_template.xml',
+        'views/admin_views_enhanced.xml',
     ],
     'assets': {
+        'web.assets_backend': [
+            'quiz_engine_pro/static/src/css/quiz_design_system.css',
+            'quiz_engine_pro/static/src/js/question_editor.js',
+            'quiz_engine_pro/static/src/xml/question_editor_templates.xml',
+        ],
         'web.assets_frontend': [
+            # Enhanced Design System
+            'quiz_engine_pro/static/src/css/quiz_design_system.css',
+            # Original CSS files (keep for compatibility)
             'quiz_engine_pro/static/src/css/quiz_styles.css',
             'quiz_engine_pro/static/src/css/quiz_drag_drop.css',
             'quiz_engine_pro/static/src/css/quiz_dropdown.css',
             'quiz_engine_pro/static/src/css/quiz_sequence.css',
+            'quiz_engine_pro/static/src/css/quiz_matrix.css',
+            'quiz_engine_pro/static/src/css/quiz_fill_blanks.css',
+            'quiz_engine_pro/static/src/css/quiz_sentence_completion.css',
+            # Enhanced JavaScript
+            'quiz_engine_pro/static/src/js/quiz_enhanced_interaction.js',
+            'quiz_engine_pro/static/src/js/quiz_fill_blanks.js',
+            'quiz_engine_pro/static/src/js/quiz_sentence_completion.js',
+            # Original JS files (keep for compatibility)
             'quiz_engine_pro/static/src/js/sequence_buttons.js',
         ],
     },

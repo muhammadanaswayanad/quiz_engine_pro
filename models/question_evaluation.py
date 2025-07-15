@@ -16,6 +16,8 @@ class QuestionEvaluation(models.Model):
             return self._evaluate_match(answer_data)
         elif self.type in ['drag_zone', 'drag_into_text']:
             return self._evaluate_drag_drop(answer_data)
+        elif self.type == 'sentence_completion':
+            return self._evaluate_sentence_completion(answer_data)
         elif self.type == 'text_box':
             return self._evaluate_text_box(answer_data)
         elif self.type == 'numerical':
@@ -57,7 +59,7 @@ class QuestionEvaluation(models.Model):
         
         try:
             answers = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
-        except:
+        except Exception:
             return 0.0
         
         total_blanks = len(self.fill_blank_answer_ids)
@@ -82,7 +84,7 @@ class QuestionEvaluation(models.Model):
         
         try:
             matches = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
-        except:
+        except Exception:
             return 0.0
         
         total_pairs = len(self.match_pair_ids)
@@ -106,7 +108,7 @@ class QuestionEvaluation(models.Model):
         
         try:
             placements = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
-        except:
+        except Exception:
             return 0.0
         
         total_tokens = len(self.drag_token_ids)
@@ -116,9 +118,8 @@ class QuestionEvaluation(models.Model):
         correct_count = 0
         for token in self.drag_token_ids:
             blank_key = str(token.correct_position)
-            if blank_key in placements:
-                if placements[blank_key] == token.text:
-                    correct_count += 1
+            if blank_key in placements and placements[blank_key] == token.text:
+                correct_count += 1
         
         return (correct_count / total_tokens) * self.points
 
@@ -188,7 +189,7 @@ class QuestionEvaluation(models.Model):
         
         try:
             answers = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
-        except:
+        except Exception:
             return 0.0
         
         total_cells = len(self.matrix_row_ids) * len(self.matrix_column_ids)
@@ -214,7 +215,7 @@ class QuestionEvaluation(models.Model):
         
         try:
             answers = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
-        except:
+        except Exception:
             return 0.0
         
         total_blanks = len(self.blank_ids)
@@ -237,3 +238,56 @@ class QuestionEvaluation(models.Model):
                 correct_count += 1
         
         return (correct_count / total_blanks) * self.points
+        
+    def _evaluate_sentence_completion(self, answer_data):
+        """Evaluate sentence completion questions"""
+        if not answer_data:
+            return 0.0
+        
+        try:
+            placement_data = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
+        except Exception:
+            return 0.0
+        
+        # Check if we have tokens and blanks
+        total_blanks = self.question_html.count('{blank}') if self.question_html else 0
+        if total_blanks == 0 or not self.drag_token_ids:
+            return 0.0
+            
+        # Create mapping for correct positions
+        correct_positions = {}
+        
+        # Find correct positions based on the {blank} placeholders and tokens' correct_position
+        for token in self.drag_token_ids:
+            if token.correct_position >= 0 and token.correct_position < total_blanks:
+                correct_positions[f"blank_{token.correct_position}"] = token.id
+        
+        # Count correct placements
+        correct_count = self._count_correct_placements(placement_data, correct_positions)
+        
+        # Calculate score proportionally to correct answers
+        return (correct_count / total_blanks) * self.points
+        
+    def _count_correct_placements(self, placement_data, correct_positions):
+        """Helper method to count correct token placements"""
+        correct_count = 0
+        processed_blanks = set()
+        
+        for placement in placement_data:
+            if 'zone_id' not in placement or 'token_id' not in placement:
+                continue
+                
+            zone_id = placement['zone_id']
+            token_id = int(placement['token_id'])
+            
+            # Prevent counting the same blank multiple times
+            if zone_id in processed_blanks:
+                continue
+                
+            processed_blanks.add(zone_id)
+            
+            # Check if this is the correct token for this zone
+            if zone_id in correct_positions and correct_positions[zone_id] == token_id:
+                correct_count += 1
+                
+        return correct_count

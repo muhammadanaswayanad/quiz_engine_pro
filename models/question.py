@@ -30,7 +30,8 @@ class Question(models.Model):
         ('drag_text', 'Drag into Text'),
         ('drag_zone', 'Drag into Zones'),
         ('dropdown_blank', 'Dropdown in Text'),
-        ('step_sequence', 'Drag and Drop - Step Sequencing')
+        ('step_sequence', 'Drag and Drop - Step Sequencing'),
+        ('sentence_completion', 'Sentence Completion')
     ], string='Type', default='mcq_single', required=True)
     
     # Text template for dropdown_blank type
@@ -74,7 +75,7 @@ class Question(models.Model):
             elif question.type == 'match':
                 if not question.match_pair_ids:
                     raise ValidationError(_('Match questions must have match pairs defined.'))
-            elif question.type == 'drag_text' or question.type == 'drag_zone':
+            elif question.type in ['drag_text', 'drag_zone', 'sentence_completion']:
                 if not question.drag_token_ids:
                     raise ValidationError(_('Drag and drop questions must have tokens defined.'))
             elif question.type == 'dropdown_blank':

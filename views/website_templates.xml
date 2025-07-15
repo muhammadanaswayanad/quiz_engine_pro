@@ -168,15 +168,37 @@
                                             <!-- Fill in the Blanks -->
                                             <t t-if="question.type == 'fill_blank'">
                                                 <div class="fill-blanks">
-                                                    <p>Fill in the missing words:</p>
-                                                    <t t-foreach="question.fill_blank_answer_ids" t-as="blank">
-                                                        <div class="form-group mb-3">
-                                                            <label>Blank <t t-esc="blank.blank_number"/>:</label>
-                                                            <input type="text" class="form-control" 
-                                                                   t-att-name="'blank_%s' % blank.blank_number" 
-                                                                   placeholder="Enter your answer"/>
-                                                        </div>
-                                                    </t>
+                                                    <div class="question-content-with-blanks mb-4">
+                                                        <!-- Parse the question HTML and replace {blank} with input fields -->
+                                                        <t t-set="blank_count" t-value="0"/>
+                                                        <t t-set="html_content" t-value="question.question_html"/>
+                                                        <t t-if="html_content">
+                                                            <t t-set="parts" t-value="html_content.split('{blank}')"/>
+                                                            <t t-foreach="parts" t-as="part">
+                                                                <t t-esc="part"/>
+                                                                <t t-if="not part_last">
+                                                                    <t t-set="blank_count" t-value="blank_count + 1"/>
+                                                                    <t t-set="answer_blank" t-value="next((b for b in question.fill_blank_answer_ids if b.blank_number == blank_count), False)"/>
+                                                                    <input type="text" class="form-control d-inline-block mx-1" 
+                                                                           style="width: auto; min-width: 120px; max-width: 200px;"
+                                                                           t-att-name="'blank_' + str(blank_count)" 
+                                                                           placeholder="Enter answer"/>
+                                                                </t>
+                                                            </t>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <!-- Fallback to original format if no HTML content -->
+                                                            <p>Fill in the missing words:</p>
+                                                            <t t-foreach="question.fill_blank_answer_ids" t-as="blank">
+                                                                <div class="form-group mb-3">
+                                                                    <label>Blank <t t-esc="blank.blank_number"/>:</label>
+                                                                    <input type="text" class="form-control" 
+                                                                           t-att-name="'blank_' + str(blank.blank_number)" 
+                                                                           placeholder="Enter your answer"/>
+                                                                </div>
+                                                            </t>
+                                                        </t>
+                                                    </div>
                                                 </div>
                                             </t>
                                             
@@ -656,7 +678,7 @@
                                             </t>
 
                                             <!-- Default fallback for other question types -->
-                                            <t t-if="question.type not in ['mcq_single', 'mcq_multiple', 'fill_blank', 'dropdown_blank', 'drag_zone', 'drag_text', 'match']">
+                                            <t t-if="question.type not in ['mcq_single', 'mcq_multiple', 'fill_blank', 'dropdown_blank', 'drag_zone', 'drag_text', 'match', 'sentence_completion', 'step_sequence']">
                                                 <div class="alert alert-info">
                                                     <p>This question type (<t t-esc="question.type"/>) is not yet implemented in the frontend.</p>
                                                     <textarea name="answer_data" class="form-control" placeholder="Enter your answer here..."></textarea>

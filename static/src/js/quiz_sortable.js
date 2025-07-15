@@ -1,4 +1,6 @@
-odoo.define('quiz_engine_pro.sortable', function (require) {
+odoo.define('quiz_engine_pro.sortable', [
+    'web.public.widget'
+], function (require) {
     'use strict';
     
     var publicWidget = require('web.public.widget');

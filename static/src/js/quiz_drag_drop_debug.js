@@ -1,4 +1,4 @@
-odoo.define('quiz_engine_pro.drag_drop_debug', function (require) {
+odoo.define('quiz_engine_pro.drag_drop_debug', [], function (require) {
     'use strict';
     
     $(document).ready(function() {

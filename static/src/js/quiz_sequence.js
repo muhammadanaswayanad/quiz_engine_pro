@@ -1,4 +1,6 @@
-odoo.define('quiz_engine_pro.sequence', function (require) {
+odoo.define('quiz_engine_pro.sequence', [
+    'web.public.widget'
+], function (require) {
     'use strict';
 
     var publicWidget = require('web.public.widget');

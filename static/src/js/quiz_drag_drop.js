@@ -1,4 +1,6 @@
-odoo.define('quiz_engine_pro.drag_drop', function (require) {
+odoo.define('quiz_engine_pro.drag_drop', [
+    'web.public.widget'
+], function (require) {
     'use strict';
 
     var publicWidget = require('web.public.widget');
@@ -157,104 +159,6 @@ odoo.define('quiz_engine_pro.drag_drop', function (require) {
                 // Update form data
                 this._updateFormData();
             }
-        }
-    });
-
-    return publicWidget.registry.QuizDragDrop;
-});
-            var tokenId = ev.originalEvent.dataTransfer.getData('text/plain');
-            var $token = this.$('.draggable-token[data-token-id="' + tokenId + '"]');
-            
-            if ($token.length) {
-                // Move the token to the drop zone
-                $token.detach().appendTo($target);
-                $token.removeClass('dragging');
-                
-                // Update form data
-                this._updateFormData();
-            }
-        },
-        
-        // Touch event handlers for mobile devices
-        _onTouchStart: function(ev) {
-            var touch = ev.originalEvent.touches[0];
-            var $token = $(ev.currentTarget);
-            
-            this.touchDragging = true;
-            this.currentDraggedElement = $token;
-            
-            // Store initial position
-            this.touchStartX = touch.clientX;
-            this.touchStartY = touch.clientY;
-            
-            // Clone element for visual dragging
-            this.$dragVisual = $token.clone().addClass('dragging-touch')
-                .css({
-                    position: 'fixed',
-                    top: touch.clientY - ($token.height() / 2),
-                    left: touch.clientX - ($token.width() / 2),
-                    zIndex: 1000,
-                    opacity: 0.8,
-                    width: $token.width(),
-                    pointerEvents: 'none'
-                })
-                .appendTo('body');
-            
-            $token.addClass('being-dragged');
-        },
-        
-        _onTouchMove: function(ev) {
-            if (!this.touchDragging) return;
-            
-            ev.preventDefault();
-            var touch = ev.originalEvent.touches[0];
-            
-            // Move the visual element
-            this.$dragVisual.css({
-                top: touch.clientY - (this.$dragVisual.height() / 2),
-                left: touch.clientX - (this.$dragVisual.width() / 2)
-            });
-            
-            // Check if we're over a drop zone
-            this.$('.drop-zone').removeClass('drag-over');
-            var dropZone = this._getTouchDropZone(touch.clientX, touch.clientY);
-            if (dropZone) {
-                $(dropZone).addClass('drag-over');
-            }
-        },
-        
-        _onTouchEnd: function(ev) {
-            if (!this.touchDragging) return;
-            
-            var touch = ev.originalEvent.changedTouches[0];
-            var dropZone = this._getTouchDropZone(touch.clientX, touch.clientY);
-            
-            if (dropZone && this.currentDraggedElement) {
-                // Move the actual token to the drop zone
-                this.currentDraggedElement.detach().appendTo($(dropZone));
-                
-                // Update form data
-                this._updateFormData();
-            }
-            
-            // Clean up
-            this.currentDraggedElement.removeClass('being-dragged');
-            this.$dragVisual.remove();
-            this.$('.drop-zone').removeClass('drag-over');
-            this.touchDragging = false;
-        },
-        
-        _getTouchDropZone: function(x, y) {
-            var result = null;
-            this.$('.drop-zone').each(function() {
-                var offset = $(this).offset();
-                if (x >= offset.left && x <= offset.left + $(this).width() &&
-                    y >= offset.top && y <= offset.top + $(this).height()) {
-                    result = this;
-                    return false; // Break the loop
-                }
-            });
-            return result;
         }
     });
 
