@@ -1,4 +1,4 @@
-# Quiz Engine Pro
+# Quiz
 
 🎯 **A comprehensive quiz engine module for Odoo 17 Community Edition with advanced question types and interactive features.**
 
@@ -61,7 +61,7 @@
 1. **Clone/Download Module**
    ```bash
    cd /home/tl/code/custom_addons/
-   # Place quiz_engine_pro folder here
+   # Place quiz folder here
    ```
 
 2. **Update Odoo Configuration**
@@ -77,7 +77,7 @@
 
 4. **Install Module**
    - Go to Apps menu in Odoo backend
-   - Search for "Quiz Engine Pro"
+   - Search for "Quiz"
    - Click Install
 
 ## 🎯 Quick Start Guide
@@ -296,7 +296,7 @@ Check URL: /quiz/your-slug
 tail -f /var/log/odoo/odoo.log
 
 # Verify file permissions
-chown -R odoo:odoo /path/to/custom_addons/quiz_engine_pro
+chown -R odoo:odoo /path/to/custom_addons/quiz
 
 # Restart Odoo after changes
 sudo systemctl restart odoo

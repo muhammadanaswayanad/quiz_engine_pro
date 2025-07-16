@@ -1,6 +1,6 @@
-# Quiz Engine Pro - Development Worklog
+# Quiz - Development Worklog
 
-**Project:** Quiz Engine Pro for Odoo 17  
+**Project:** Quiz for Odoo 17  
 **Status:** Production Ready ✅  
 **Version:** 17.0.1.0.5  
 **Total Sessions:** 14  

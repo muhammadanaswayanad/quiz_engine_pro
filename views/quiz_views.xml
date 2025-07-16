@@ -119,7 +119,7 @@
 
     <!-- Main Menu Structure -->
     <menuitem id="menu_quiz_engine_root" 
-              name="Quiz Engine" 
+              name="Quiz" 
               web_icon="quiz_engine_pro,static/description/icon.png"
               sequence="10"/>
     
