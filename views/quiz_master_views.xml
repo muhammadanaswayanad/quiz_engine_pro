@@ -6,7 +6,7 @@
         <field name="res_model">res.users</field>
         <field name="view_mode">tree,form</field>
         <field name="domain">[('groups_id', 'in', [ref('quiz_engine_pro.group_quiz_master')])]</field>
-        <field name="context">{'default_groups_id': [(4, ref('quiz_engine_pro.group_quiz_master'))]}</field>
+        <field name="context" eval="{'default_groups_id': [(4, ref('quiz_engine_pro.group_quiz_master'))]}"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add a new user to the Quiz Masters group
