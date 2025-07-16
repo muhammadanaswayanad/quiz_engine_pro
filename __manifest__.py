@@ -19,7 +19,7 @@
     'external_dependencies': {'python': []},
     'data': [
         'security/security_groups.xml',
-        'security/new_access_rights.csv',
+        'security/ir.model.access.csv',
         'views/quiz_views.xml',
         'views/question_views.xml', 
         'views/session_views.xml',

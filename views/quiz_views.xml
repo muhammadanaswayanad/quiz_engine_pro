@@ -122,27 +122,27 @@
               name="Quiz" 
               web_icon="quiz_engine_pro,static/description/icon.png"
               sequence="10"
-              groups="base.group_user,group_quiz_master"/>
+              groups="base.group_user,quiz_engine_pro.group_quiz_master"/>
     
     <menuitem id="menu_quiz_main" 
               name="Quizzes" 
               parent="menu_quiz_engine_root" 
               action="action_quiz_list" 
               sequence="10"
-              groups="group_quiz_master"/>
+              groups="quiz_engine_pro.group_quiz_master"/>
               
     <menuitem id="menu_questions" 
               name="All Questions" 
               parent="menu_quiz_engine_root" 
               action="action_questions" 
               sequence="20"
-              groups="group_quiz_master"/>
+              groups="quiz_engine_pro.group_quiz_master"/>
               
     <menuitem id="menu_sessions" 
               name="Quiz Sessions" 
               parent="menu_quiz_engine_root" 
               action="action_quiz_sessions" 
               sequence="30"
-              groups="group_quiz_master"/>
+              groups="quiz_engine_pro.group_quiz_master"/>
 
 </odoo>

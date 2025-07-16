@@ -14,6 +14,23 @@ access_quiz_drag_zone_user,quiz.drag.zone user,model_quiz_drag_zone,base.group_u
 access_quiz_session_user,quiz.session user,model_quiz_session,base.group_user,1,1,1,1
 access_quiz_response_user,quiz.response user,model_quiz_response,base.group_user,1,1,1,1
 
+access_quiz_quiz_master,quiz.quiz master,model_quiz_quiz,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_question_master,quiz.question master,model_quiz_question,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_choice_master,quiz.choice master,model_quiz_choice,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_match_pair_master,quiz.match.pair master,model_quiz_match_pair,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_drag_token_master,quiz.drag.token master,model_quiz_drag_token,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_fill_blank_answer_master,quiz.fill.blank.answer master,model_quiz_fill_blank_answer,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_blank_master,quiz.blank master,model_quiz_blank,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_option_master,quiz.option master,model_quiz_option,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_matrix_row_master,quiz.matrix.row master,model_quiz_matrix_row,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_matrix_column_master,quiz.matrix.column master,model_quiz_matrix_column,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_matrix_cell_master,quiz.matrix.cell master,model_quiz_matrix_cell,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_drag_zone_master,quiz.drag.zone master,model_quiz_drag_zone,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_session_master,quiz.session master,model_quiz_session,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_response_master,quiz.response master,model_quiz_response,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_sequence_item_master,quiz.sequence.item master,model_quiz_sequence_item,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_sequence_step_master,quiz.sequence.step master,model_quiz_sequence_step,quiz_engine_pro.group_quiz_master,1,1,1,1
+
 access_quiz_quiz_admin,quiz.quiz admin,model_quiz_quiz,base.group_user,1,1,1,1
 access_quiz_question_admin,quiz.question admin,model_quiz_question,base.group_user,1,1,1,1
 access_quiz_choice_admin,quiz.choice admin,model_quiz_choice,base.group_user,1,1,1,1

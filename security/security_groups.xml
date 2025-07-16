@@ -10,7 +10,7 @@
     <!-- Define Quiz Master group with full access to the module -->
     <record id="group_quiz_master" model="res.groups">
         <field name="name">Quiz Masters</field>
-        <field name="category_id" ref="module_category_quiz"/>
+        <field name="category_id" ref="quiz_engine_pro.module_category_quiz"/>
         <field name="comment">Users in this group can create, edit, and manage all quizzes, questions, and sessions.</field>
     </record>
 </odoo>
