@@ -18,10 +18,12 @@
     'depends': ['base', 'web', 'website'],
     'external_dependencies': {'python': []},
     'data': [
-        'security/ir.model.access.csv',
+        'security/security_groups.xml',
+        'security/new_access_rights.csv',
         'views/quiz_views.xml',
         'views/question_views.xml', 
         'views/session_views.xml',
+        'views/quiz_master_views.xml',
         'views/website_templates.xml',
         'views/enhanced_website_templates.xml',
         'views/sentence_completion_template.xml',

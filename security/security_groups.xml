@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Define category for Quiz module security groups -->
+    <record id="module_category_quiz" model="ir.module.category">
+        <field name="name">Quiz</field>
+        <field name="description">Manage quizzes, questions, and quiz sessions</field>
+        <field name="sequence">20</field>
+    </record>
+
+    <!-- Define Quiz Master group with full access to the module -->
+    <record id="group_quiz_master" model="res.groups">
+        <field name="name">Quiz Masters</field>
+        <field name="category_id" ref="module_category_quiz"/>
+        <field name="comment">Users in this group can create, edit, and manage all quizzes, questions, and sessions.</field>
+    </record>
+</odoo>
