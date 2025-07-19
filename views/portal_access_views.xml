@@ -40,8 +40,9 @@
                     </div>
                     <group>
                         <group>
+                            <field name="portal_group_id" invisible="1"/>
                             <field name="quiz_id" options="{'no_create': True}"/>
-                            <field name="user_id" options="{'no_create': True}"/>
+                            <field name="user_id" domain="[('groups_id', '=', portal_group_id)]" options="{'no_create': True}"/>
                             <field name="partner_id" readonly="1"/>
                             <field name="email" readonly="1"/>
                         </group>
@@ -90,7 +91,8 @@
                     <group>
                         <field name="quiz_id" options="{'no_create': True}" readonly="1"/>
                         <field name="action" widget="radio"/>
-                        <field name="user_ids" domain="[('groups_id', '=', ref('base.group_portal'))]" widget="many2many_tags" options="{'no_create': True}"/>
+                        <field name="portal_group_id" invisible="1"/>
+                        <field name="user_ids" domain="[('groups_id', '=', portal_group_id)]" widget="many2many_tags" options="{'no_create': True}"/>
                     </group>
                     <footer>
                         <button name="action_apply" string="Apply" type="object" class="oe_highlight"/>

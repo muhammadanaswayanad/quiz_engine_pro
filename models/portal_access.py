@@ -8,8 +8,9 @@ class QuizPortalAccess(models.Model):
     
     name = fields.Char(string='Name', compute='_compute_name', store=True)
     quiz_id = fields.Many2one('quiz.quiz', string='Quiz', required=True)
-    user_id = fields.Many2one('res.users', string='Portal User', required=True,
-                             domain=[('groups_id', 'in', [('base.group_portal')])])
+    portal_group_id = fields.Many2one('res.groups', string='Portal Group', 
+                                    default=lambda self: self.env.ref('base.group_portal'))
+    user_id = fields.Many2one('res.users', string='Portal User', required=True)
     partner_id = fields.Many2one('res.partner', string='Partner', 
                                 related='user_id.partner_id', store=True)
     email = fields.Char(string='Email', related='partner_id.email', store=True)
@@ -103,8 +104,9 @@ class QuizPortalAccessWizard(models.TransientModel):
     _description = 'Portal Access Wizard'
     
     quiz_id = fields.Many2one('quiz.quiz', string='Quiz', required=True)
-    user_ids = fields.Many2many('res.users', string='Portal Users',
-                              domain=[('groups_id', 'in', [('base.group_portal')])])
+    portal_group_id = fields.Many2one('res.groups', string='Portal Group', 
+                                    default=lambda self: self.env.ref('base.group_portal'))
+    user_ids = fields.Many2many('res.users', string='Portal Users')
     action = fields.Selection([
         ('grant', 'Grant Access'),
         ('revoke', 'Revoke Access')
