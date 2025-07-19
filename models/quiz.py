@@ -32,6 +32,41 @@ class Quiz(models.Model):
     
     invitation_ids = fields.One2many('quiz.access.invitation', 'quiz_ids', 
                                   string='Access Invitations')
+                                  
+    # Simplified Portal access management
+    portal_access_ids = fields.One2many('quiz.portal.access', 'quiz_id', 
+                                     string='Portal User Access')
+    portal_user_count = fields.Integer(string='Portal Users', compute='_compute_portal_user_count')
+    
+    @api.depends('portal_access_ids')
+    def _compute_portal_user_count(self):
+        for quiz in self:
+            quiz.portal_user_count = len(quiz.portal_access_ids)
+    
+    def action_open_portal_users(self):
+        """Open portal users view for this quiz"""
+        self.ensure_one()
+        return {
+            'name': _('Portal Users'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'quiz.portal.access',
+            'view_mode': 'tree,form',
+            'domain': [('quiz_id', '=', self.id)],
+            'context': {'default_quiz_id': self.id},
+            'target': 'current',
+        }
+        
+    def action_add_portal_users(self):
+        """Open wizard to add portal users"""
+        self.ensure_one()
+        return {
+            'name': _('Add Portal Users'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'quiz.portal.access.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {'default_quiz_id': self.id, 'default_action': 'grant'},
+        }
     
     # Relationships
     question_ids = fields.One2many('quiz.question', 'quiz_id', string='Questions')

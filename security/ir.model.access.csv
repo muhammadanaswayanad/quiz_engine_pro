@@ -65,3 +65,11 @@ access_quiz_question_category_public,quiz.question.category public,model_quiz_qu
 access_quiz_access_invitation_user,quiz.access.invitation user,model_quiz_access_invitation,base.group_user,1,1,1,1
 access_quiz_access_invitation_master,quiz.access.invitation master,model_quiz_access_invitation,quiz_engine_pro.group_quiz_master,1,1,1,1
 access_quiz_access_invitation_public,quiz.access.invitation public,model_quiz_access_invitation,base.group_public,0,0,0,0
+
+access_quiz_portal_access_user,quiz.portal.access user,model_quiz_portal_access,base.group_user,1,1,1,1
+access_quiz_portal_access_master,quiz.portal.access master,model_quiz_portal_access,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_portal_access_public,quiz.portal.access public,model_quiz_portal_access,base.group_public,0,0,0,0
+access_quiz_portal_access_portal,quiz.portal.access portal,model_quiz_portal_access,base.group_portal,1,0,0,0
+
+access_quiz_portal_access_wizard_user,quiz.portal.access.wizard user,model_quiz_portal_access_wizard,base.group_user,1,1,1,1
+access_quiz_portal_access_wizard_master,quiz.portal.access.wizard master,model_quiz_portal_access_wizard,quiz_engine_pro.group_quiz_master,1,1,1,1

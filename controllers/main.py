@@ -1,7 +1,10 @@
-from odoo import http, fields
+from odoo import http, fields, _
 from odoo.http import request
 import json
 import uuid
+import logging
+
+_logger = logging.getLogger(__name__)
 
 
 class QuizController(http.Controller):
@@ -16,8 +19,19 @@ class QuizController(http.Controller):
             # Public users can only access public quizzes
             domain.append(('access_mode', '=', 'public'))
         elif request.env.user.has_group('base.group_portal'):
-            # Portal users can access public and portal quizzes
-            domain.append(('access_mode', 'in', ['public', 'portal']))
+            # Portal users can access public quizzes and portal quizzes they have access to
+            portal_quizzes = []
+            if not request.env.user._is_public():
+                # Find quizzes this portal user has explicit access to
+                portal_access = request.env['quiz.portal.access'].sudo().search([
+                    ('user_id', '=', request.env.user.id),
+                    ('state', 'in', ['invited', 'accessed'])
+                ])
+                portal_quizzes = portal_access.mapped('quiz_id.id')
+            
+            domain = ['|', ('access_mode', '=', 'public'),
+                     '|', ('access_mode', '=', 'portal'),
+                     '&', ('access_mode', '=', 'invitation'), ('id', 'in', portal_quizzes)]
         elif request.env.user.has_group('quiz_engine_pro.group_quiz_invited'):
             # Invited users can access public, portal, and invitation quizzes
             domain.append(('access_mode', 'in', ['public', 'portal', 'invitation']))
@@ -56,7 +70,28 @@ class QuizController(http.Controller):
         if quiz.access_mode == 'public':
             can_access = True
         elif quiz.access_mode == 'portal' and not request.env.user._is_public():
-            can_access = True
+            # Check if this is a portal user with explicit access to this quiz
+            if request.env.user.has_group('base.group_portal'):
+                portal_access = request.env['quiz.portal.access'].sudo().search([
+                    ('quiz_id', '=', quiz.id),
+                    ('user_id', '=', request.env.user.id),
+                    ('state', 'in', ['invited', 'accessed']),
+                ], limit=1)
+                
+                if portal_access:
+                    # Register access time
+                    portal_access.write({
+                        'state': 'accessed',
+                        'last_access': fields.Datetime.now()
+                    })
+                    can_access = True
+                    
+                # If quiz is set to portal access mode, any portal user can access
+                if quiz.access_mode == 'portal':
+                    can_access = True
+            else:
+                # Non-portal registered users (like internal)
+                can_access = True
         elif quiz.access_mode == 'internal' and request.env.user.has_group('base.group_user'):
             can_access = True
         
@@ -101,6 +136,27 @@ class QuizController(http.Controller):
             'state': 'in_progress',
             'start_time': fields.Datetime.now(),
         })
+        
+        # Register access for portal users
+        access_token = kwargs.get('token')
+        if access_token:
+            invitation = request.env['quiz.access.invitation'].sudo().validate_token(access_token, quiz.id)
+            if invitation:
+                # Register that the invitation was used
+                invitation.sudo().mark_as_used()
+                # Register access in portal access model if applicable
+                request.env['quiz.portal.access'].sudo().register_access(access_token)
+        elif not request.env.user._is_public() and request.env.user.has_group('base.group_portal'):
+            # Find portal access record for this user and mark it accessed
+            portal_access = request.env['quiz.portal.access'].sudo().search([
+                ('quiz_id', '=', quiz.id),
+                ('user_id', '=', request.env.user.id),
+            ], limit=1)
+            if portal_access:
+                portal_access.write({
+                    'state': 'accessed',
+                    'last_access': fields.Datetime.now()
+                })
         
         # Include access token if provided
         access_token = kwargs.get('token')

@@ -106,6 +106,29 @@
                                 </tree>
                             </field>
                         </page>
+                        <page string="Portal Users" attrs="{'invisible': [('access_mode', 'not in', ['portal', 'invitation'])]}">
+                            <div class="oe_button_box" name="button_box">
+                                <button name="action_add_portal_users" type="object" 
+                                        string="Add Portal Users" class="btn btn-primary"/>
+                            </div>
+                            <field name="portal_access_ids" mode="tree">
+                                <tree decoration-success="state == 'accessed'" decoration-warning="state == 'invited'" decoration-danger="state == 'revoked'">
+                                    <field name="user_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="email"/>
+                                    <field name="state"/>
+                                    <field name="last_access"/>
+                                    <button name="action_send_invitation" string="Send" type="object" icon="fa-envelope" 
+                                            attrs="{'invisible': [('state', 'in', ['accessed', 'revoked'])]}"/>
+                                    <button name="action_revoke_access" string="Revoke" type="object" icon="fa-ban" 
+                                            attrs="{'invisible': [('state', '=', 'revoked')]}"/>
+                                </tree>
+                            </field>
+                            <div class="text-muted mt-3">
+                                <p>Manage portal user access to this quiz. Add portal users and send them invitations directly from here.</p>
+                                <p>States: <span class="badge badge-info">Draft</span> = Access created but not sent, <span class="badge badge-warning">Invited</span> = Invitation sent, <span class="badge badge-success">Accessed</span> = User has accessed the quiz, <span class="badge badge-danger">Revoked</span> = Access has been revoked</p>
+                            </div>
+                        </page>
                         <page string="Access Control" invisible="access_mode == 'public'">
                             <group>
                                 <group>

@@ -31,6 +31,7 @@
         'views/matrix_views.xml',
         'views/passage_views.xml',
         'views/access_control_views.xml',
+        'views/portal_access_views.xml',
         'views/access_denied_template.xml',
     ],
     'assets': {
