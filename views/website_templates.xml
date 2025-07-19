@@ -32,7 +32,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="card-footer">
-                                                    <a t-attf-href="/quiz/#{quiz.slug}" class="btn btn-primary btn-block">
+                                                    <a t-attf-href="/quiz/#{quiz.slug}#{token and ('?token=' + token) or ''}" class="btn btn-primary btn-block">
                                                         Start Quiz
                                                     </a>
                                                 </div>
@@ -72,7 +72,8 @@
                                         <li><strong>Passing Score:</strong> <t t-esc="quiz.passing_score"/>%</li>
                                     </ul>
                                     
-                                    <form t-attf-action="/quiz/#{quiz.slug}/start" method="post" class="mt-4">
+                                    <form t-attf-action="/quiz/#{quiz.slug}/start#{token and ('?token=' + token) or ''}" method="post" class="mt-4">
+                                        <input type="hidden" name="token" t-att-value="token" t-if="token"/>
                                         <div class="form-group mb-3">
                                             <label for="participant_name">Your Name *</label>
                                             <input type="text" name="participant_name" class="form-control" required="required"/>
@@ -132,6 +133,7 @@
                                         
                                         <form method="post" class="question-form">
                                             <input type="hidden" name="session" t-att-value="session.session_token"/>
+                                            <input type="hidden" name="token" t-att-value="token" t-if="token"/>
                                             
                                             <!-- Multiple Choice Single -->
                                             <t t-if="question.type == 'mcq_single'">

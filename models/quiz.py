@@ -17,6 +17,22 @@ class Quiz(models.Model):
     show_results = fields.Boolean(string='Show Results After Completion', default=True)
     passing_score = fields.Float(string='Passing Score (%)', default=60.0)
     
+    # Access control fields
+    access_mode = fields.Selection([
+        ('public', 'Public - Anyone can access'),
+        ('portal', 'Portal - Registered users only'),
+        ('invitation', 'Invitation - Only invited users'),
+        ('internal', 'Internal - Employees only')
+    ], string='Access Mode', default='internal', required=True,
+        help="Controls who can access this quiz")
+        
+    allowed_category_ids = fields.Many2many('quiz.question.category', 
+                                         string='Allowed Categories',
+                                         help="Only questions from these categories will be included")
+    
+    invitation_ids = fields.One2many('quiz.access.invitation', 'quiz_ids', 
+                                  string='Access Invitations')
+    
     # Relationships
     question_ids = fields.One2many('quiz.question', 'quiz_id', string='Questions')
     session_ids = fields.One2many('quiz.session', 'quiz_id', string='Quiz Sessions')

@@ -57,3 +57,11 @@ access_quiz_passage_choice_master,quiz.passage.choice master,model_quiz_passage_
 access_quiz_passage_public,quiz.passage public,model_quiz_passage,base.group_public,1,0,0,0
 access_quiz_passage_sub_question_public,quiz.passage.sub.question public,model_quiz_passage_sub_question,base.group_public,1,0,0,0
 access_quiz_passage_choice_public,quiz.passage.choice public,model_quiz_passage_choice,base.group_public,1,0,0,0
+
+access_quiz_question_category_user,quiz.question.category user,model_quiz_question_category,base.group_user,1,1,1,1
+access_quiz_question_category_master,quiz.question.category master,model_quiz_question_category,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_question_category_public,quiz.question.category public,model_quiz_question_category,base.group_public,1,0,0,0
+
+access_quiz_access_invitation_user,quiz.access.invitation user,model_quiz_access_invitation,base.group_user,1,1,1,1
+access_quiz_access_invitation_master,quiz.access.invitation master,model_quiz_access_invitation,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_access_invitation_public,quiz.access.invitation public,model_quiz_access_invitation,base.group_public,0,0,0,0

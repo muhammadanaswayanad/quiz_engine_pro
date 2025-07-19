@@ -8,22 +8,73 @@ class QuizController(http.Controller):
 
     @http.route(['/quiz'], type='http', auth='public', website=True)
     def quiz_list(self, **kwargs):
-        """List all published quizzes"""
-        quizzes = request.env['quiz.quiz'].sudo().search([('published', '=', True)])
+        """List all published quizzes that the user has access to"""
+        domain = [('published', '=', True)]
+        
+        # Check user access level
+        if request.env.user._is_public():
+            # Public users can only access public quizzes
+            domain.append(('access_mode', '=', 'public'))
+        elif request.env.user.has_group('base.group_portal'):
+            # Portal users can access public and portal quizzes
+            domain.append(('access_mode', 'in', ['public', 'portal']))
+        elif request.env.user.has_group('quiz_engine_pro.group_quiz_invited'):
+            # Invited users can access public, portal, and invitation quizzes
+            domain.append(('access_mode', 'in', ['public', 'portal', 'invitation']))
+        
+        # Check for token-based access
+        token = kwargs.get('token')
+        if token:
+            invitation = request.env['quiz.access.invitation'].sudo().validate_token(token)
+            if invitation:
+                # Include quizzes from valid invitation
+                quizzes = invitation.quiz_ids.filtered(lambda q: q.published)
+                domain = ['|', ('id', 'in', quizzes.ids)] + domain
+        
+        quizzes = request.env['quiz.quiz'].sudo().search(domain)
         
         values = {
             'quizzes': quizzes,
+            'token': token,  # Pass token to templates
         }
         return request.render('quiz_engine_pro.quiz_list', values)
 
     @http.route(['/quiz/<string:slug>'], type='http', auth='public', website=True)
     def quiz_detail(self, slug, **kwargs):
         """Show quiz details and start form"""
+        # First get the quiz
         quiz = request.env['quiz.quiz'].sudo().search([('slug', '=', slug), ('published', '=', True)], limit=1)
         if not quiz:
             return request.not_found()
         
+        # Check access based on user type
+        can_access = False
+        token = kwargs.get('token')
+        invitation = None
+        
+        # Check user access rights
+        if quiz.access_mode == 'public':
+            can_access = True
+        elif quiz.access_mode == 'portal' and not request.env.user._is_public():
+            can_access = True
+        elif quiz.access_mode == 'internal' and request.env.user.has_group('base.group_user'):
+            can_access = True
+        
+        # Check token-based access
+        if not can_access and token:
+            invitation = request.env['quiz.access.invitation'].sudo().validate_token(token, quiz.id)
+            if invitation:
+                can_access = True
+        
+        if not can_access:
+            return request.render('quiz_engine_pro.quiz_access_denied', {
+                'quiz': quiz,
+                'login_required': quiz.access_mode in ['portal', 'internal', 'invitation']
+            })
+        
+        # If we reach here, the user has access to the quiz
         values = {
+            'token': token,  # Pass token to templates
             'quiz': quiz,
         }
         return request.render('quiz_engine_pro.quiz_detail', values)
@@ -63,7 +114,37 @@ class QuizController(http.Controller):
             return request.redirect('/quiz')
         
         quiz = session.quiz_id
-        question = quiz.question_ids[question_num - 1] if quiz.question_ids and len(quiz.question_ids) >= question_num else None
+        questions = quiz.question_ids
+        
+        # Apply access filters based on user type
+        if request.env.user._is_public():
+            # Public users can only access public questions
+            questions = questions.filtered(lambda q: 
+                q.access_mode == 'public' or 
+                (q.access_mode == 'inherit' and q.category_id and q.category_id.access_mode == 'public'))
+        elif request.env.user.has_group('base.group_portal'):
+            # Portal users can access public and portal questions
+            questions = questions.filtered(lambda q: 
+                q.access_mode in ['public', 'portal'] or 
+                (q.access_mode == 'inherit' and q.category_id and q.category_id.access_mode in ['public', 'portal']))
+        
+        # Check for token-based access to question categories
+        token = kwargs.get('token')
+        if token:
+            invitation = request.env['quiz.access.invitation'].sudo().validate_token(token)
+            if invitation and invitation.category_ids:
+                # Include questions from allowed categories
+                category_ids = invitation.category_ids.ids
+                more_questions = quiz.question_ids.filtered(
+                    lambda q: q.category_id and q.category_id.id in category_ids
+                )
+                questions |= more_questions
+        
+        # Sort questions by sequence
+        questions = questions.sorted(lambda q: q.sequence)
+        
+        # Get the requested question by position
+        question = questions[question_num - 1] if questions and len(questions) >= question_num else None
         
         if not question:
             return request.redirect('/quiz')
@@ -90,6 +171,7 @@ class QuizController(http.Controller):
             'session': session,
             'question': question,
             'question_index': question_num - 1,
+            'token': token,  # Pass token to templates
         }
         
         # Add this code to change the message display

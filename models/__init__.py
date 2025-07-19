@@ -1,3 +1,4 @@
+from . import access_control  # Import access control models first
 from . import quiz
 from . import question
 from . import session  # Import session first to avoid circular import

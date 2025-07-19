@@ -30,6 +30,8 @@
         'views/admin_views_enhanced.xml',
         'views/matrix_views.xml',
         'views/passage_views.xml',
+        'views/access_control_views.xml',
+        'views/access_denied_template.xml',
     ],
     'assets': {
         'web.assets_backend': [

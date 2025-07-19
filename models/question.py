@@ -21,6 +21,27 @@ class Question(models.Model):
                               help="Shown after answering the question")
     points = fields.Float(string='Points', default=1.0)
     
+    # Access control fields
+    category_id = fields.Many2one('quiz.question.category', string='Access Category',
+                               help="Control who can access this question")
+    access_mode = fields.Selection([
+        ('inherit', 'Inherit from Category'),
+        ('public', 'Public - Anyone can access'),
+        ('portal', 'Portal - Registered users only'),
+        ('invitation', 'Invitation - Only invited users'),
+        ('internal', 'Internal - Employees only')
+    ], string='Access Mode', default='inherit', required=True,
+        help="Controls who can access this question")
+    
+    # Backward compatibility fields
+    is_public = fields.Boolean(string='Public Access', related='category_id.public_access', store=True, readonly=True)
+    is_portal = fields.Boolean(string='Portal Access', related='category_id.portal_access', store=True, readonly=True)
+    is_invited_only = fields.Boolean(string='Invited Only', related='category_id.invited_only', store=True, readonly=True)
+    
+    # Direct access fields
+    allowed_group_ids = fields.Many2many('res.groups', string='Allowed User Groups',
+                                       help="Specific user groups that can access this question")
+    
     def generate_matrix_cells(self):
         """Generate the matrix cells based on rows and columns"""
         self.ensure_one()
