@@ -678,7 +678,7 @@
                                             </t>
 
                                             <!-- Default fallback for other question types -->
-                                            <t t-if="question.type not in ['mcq_single', 'mcq_multiple', 'fill_blank', 'dropdown_blank', 'drag_zone', 'drag_text', 'match', 'sentence_completion', 'step_sequence']">
+                                            <t t-if="question.type not in ['mcq_single', 'mcq_multiple', 'fill_blank', 'dropdown_blank', 'drag_zone', 'drag_text', 'match', 'sentence_completion', 'step_sequence', 'matrix']">
                                                 <div class="alert alert-info">
                                                     <p>This question type (<t t-esc="question.type"/>) is not yet implemented in the frontend.</p>
                                                     <textarea name="answer_data" class="form-control" placeholder="Enter your answer here..."></textarea>
