@@ -34,7 +34,7 @@
                         </div>
                         
                         <!-- Form for token-based access -->
-                        <div class="mt-4">
+                        <div class="mt-4" t-if="quiz">
                             <h5>Have an access token?</h5>
                             <form t-attf-action="/quiz/#{quiz.slug}" method="get" class="form-inline">
                                 <div class="form-group mr-2">

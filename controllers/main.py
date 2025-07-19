@@ -102,7 +102,13 @@ class QuizController(http.Controller):
             'start_time': fields.Datetime.now(),
         })
         
-        return request.redirect(f'/quiz/{slug}/question/1?session={session.session_token}')
+        # Include access token if provided
+        access_token = kwargs.get('token')
+        redirect_url = f'/quiz/{slug}/question/1?session={session.session_token}'
+        if access_token:
+            redirect_url += f'&token={access_token}'
+            
+        return request.redirect(redirect_url)
 
     @http.route(['/quiz/<string:slug>/question/<int:question_num>'], type='http', auth='public', methods=['GET', 'POST'], csrf=False, website=True)
     def quiz_question(self, slug, question_num, **kwargs):
@@ -158,13 +164,24 @@ class QuizController(http.Controller):
                 'answer_data': json.dumps(answer_data) if answer_data else '{}',
             })
             
+            # Get access token if provided
+            access_token = kwargs.get('token')
+            
             if len(quiz.question_ids) == question_num:
                 # Last question, complete the quiz
                 session.write({'state': 'completed', 'end_time': fields.Datetime.now()})
-                return request.redirect(f'/quiz/session/{session.session_token}/results')
+                
+                # Include access token in results URL if provided
+                results_url = f'/quiz/session/{session.session_token}/results'
+                if access_token:
+                    results_url += f'?token={access_token}'
+                return request.redirect(results_url)
             else:
-                # Next question
-                return request.redirect(f'/quiz/{slug}/question/{question_num + 1}?session={session.session_token}')
+                # Next question with access token if provided
+                next_url = f'/quiz/{slug}/question/{question_num + 1}?session={session.session_token}'
+                if access_token:
+                    next_url += f'&token={access_token}'
+                return request.redirect(next_url)
         
         values = {
             'quiz': quiz,

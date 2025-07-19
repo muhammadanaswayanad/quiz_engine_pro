@@ -158,5 +158,12 @@
               action="action_quiz_sessions" 
               sequence="30"
               groups="quiz_engine_pro.group_quiz_master"/>
+              
+    <!-- Configuration Menu -->
+    <menuitem id="menu_quiz_configuration" 
+              name="Configuration" 
+              parent="menu_quiz_engine_root" 
+              sequence="90"
+              groups="quiz_engine_pro.group_quiz_master"/>
 
 </odoo>
