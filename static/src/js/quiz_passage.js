@@ -1,8 +1,8 @@
-/* JavaScript for Reading Passage Questions */
+/* JavaScript for Reading Passage Questions - Updated for Odoo 17 */
 odoo.define('quiz_engine_pro.passage_question', function (require) {
     'use strict';
 
-    var publicWidget = require('web.public.widget');
+    const publicWidget = require('web.public.widget');
 
     publicWidget.registry.PassageQuestion = publicWidget.Widget.extend({
         selector: '.passage-question',

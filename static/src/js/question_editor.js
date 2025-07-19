@@ -1,57 +1,69 @@
 /**
  * Enhanced Question Editor Component
  * Provides a unified interface for editing all question types
+ * Updated for Odoo 17 with Owl Components
  */
 
-odoo.define('quiz_engine_pro.QuestionEditor', [
-    'web.core',
-    'web.Widget',
-    'web.framework',
-    'web.rpc',
-    'web.Dialog'
-], function (require) {
+odoo.define('quiz_engine_pro.QuestionEditor', function (require) {
     'use strict';
 
-    var core = require('web.core');
-    var Widget = require('web.Widget');
-    var framework = require('web.framework');
-    var rpc = require('web.rpc');
-    var Dialog = require('web.Dialog');
+    const { Component, useState, useRef, onMounted, onWillUnmount } = owl;
+    const { useService } = require("@web/core/utils/hooks");
+    const { AlertDialog } = require("@web/core/dialog/dialog");
+    const { _t } = require("@web/core/l10n/translation");
+    
+    const rpcService = 'rpc';
+    const userService = 'user';
 
-    var QWeb = core.qweb;
-    var _t = core._t;
-
-    var QuestionEditor = Widget.extend({
-        template: 'quiz_engine_pro.question_editor',
+    /**
+     * Question Editor Component using Owl
+     */
+    class QuestionEditor extends Component {
+        static template = 'quiz_engine_pro.question_editor';
+        static props = {
+            questionId: { type: Number, optional: true },
+            quizId: { type: Number, required: true },
+            onSave: { type: Function, optional: true },
+            onCancel: { type: Function, optional: true }
+        };
         
-        events: {
-            'change #question_type': '_onTypeChange',
-            'click .add-option': '_onAddOption',
-            'click .remove-option': '_onRemoveOption',
-            'click .move-up': '_onMoveUp',
-            'click .move-down': '_onMoveDown',
-            'input .option-text': '_onOptionChange',
-            'change .option-correct': '_onCorrectChange',
-            'click .preview-question': '_onPreviewQuestion',
-            'click .save-question': '_onSaveQuestion',
-            'click .cancel-edit': '_onCancelEdit',
-        },
-
-        init: function (parent, options) {
-            this._super(parent);
-            this.question_id = options.question_id || false;
-            this.quiz_id = options.quiz_id;
-            this.question_data = options.question_data || {};
+        setup() {
+            this.rpc = useService(rpcService);
+            this.user = useService(userService);
+            
+            this.state = useState({
+                question_id: this.props.questionId || false,
+                quiz_id: this.props.quizId,
+                question_type: 'multiple_choice',
+                question_name: '',
+                question_content: '',
+                question_points: 1,
+                question_explanation: '',
+                options: [],
+                isLoading: false,
+                errorMessage: ''
+            });
+            
+            this.questionContentRef = useRef('questionContent');
+            this.optionsContainerRef = useRef('optionsContainer');
+            
             this.question_types = {
-                'multiple_choice': 'Multiple Choice',
-                'true_false': 'True/False',
+                'mcq_single': 'Multiple Choice (Single)',
+                'mcq_multiple': 'Multiple Choice (Multiple)',
                 'fill_blank': 'Fill in the Blank',
-                'drag_drop': 'Drag and Drop',
-                'dropdown': 'Dropdown',
-                'matrix': 'Matrix',
-                'sequence': 'Sequence'
+                'match': 'Match the Following',
+                'drag_text': 'Drag into Text',
+                'drag_zone': 'Drag into Zones',
+                'dropdown_blank': 'Dropdown in Text',
+                'step_sequence': 'Drag and Drop - Step Sequencing',
+                'sentence_completion': 'Sentence Completion',
+                'matrix': 'Matrix Question',
+                'passage': 'Reading Passage with Questions'
             };
-        },
+            
+            onMounted(() => this.onMounted());
+            onWillUnmount(() => this.onWillUnmount());
+        }
 
         start: function () {
             var self = this;
