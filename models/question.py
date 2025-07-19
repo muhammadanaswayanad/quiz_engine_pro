@@ -1,10 +1,7 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import re
-impor    # Matrix Question Fields
-    matrix_row_ids = fields.One2many('quiz.matrix.row', 'question_id', string='Matrix Rows')
-    matrix_column_ids = fields.One2many('quiz.matrix.column', 'question_id', string='Matrix Columns')
-    matrix_cell_ids = fields.One2many('quiz.matrix.cell', 'question_id', string='Matrix Cells')ogging
+import logging
 import json
 
 _logger = logging.getLogger(__name__)
