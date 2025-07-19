@@ -26,11 +26,11 @@
                     <field name="state" widget="statusbar" 
                         statusbar_visible="draft,invited,accessed"/>
                     <button name="action_send_invitation" string="Send Invitation" type="object"
-                        class="oe_highlight" attrs="{'invisible': [('state', 'in', ['accessed', 'revoked'])]}"/>
+                        class="oe_highlight" invisible="state in ('accessed', 'revoked')"/>
                     <button name="action_revoke_access" string="Revoke Access" type="object"
-                        class="btn btn-danger" attrs="{'invisible': [('state', '=', 'revoked')]}"/>
+                        class="btn btn-danger" invisible="state == 'revoked'"/>
                     <button name="action_reset_access" string="Reset Access" type="object"
-                        attrs="{'invisible': [('state', '!=', 'revoked')]}"/>
+                        invisible="state != 'revoked'"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
