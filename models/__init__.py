@@ -3,7 +3,6 @@ from . import question
 from . import session  # Import session first to avoid circular import
 from . import response
 from . import question_extension
-from . import question_evaluation  # Add this new module
+from . import question_evaluation
 from . import ghost_models
-
-# Ensure that the new model is added to the models initialization if that's not already done
+from . import matrix_question  # Import the new matrix question model

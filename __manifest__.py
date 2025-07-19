@@ -28,6 +28,7 @@
         'views/enhanced_website_templates.xml',
         'views/sentence_completion_template.xml',
         'views/admin_views_enhanced.xml',
+        'views/matrix_views.xml',
     ],
     'assets': {
         'web.assets_backend': [

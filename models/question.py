@@ -31,7 +31,8 @@ class Question(models.Model):
         ('drag_zone', 'Drag into Zones'),
         ('dropdown_blank', 'Dropdown in Text'),
         ('step_sequence', 'Drag and Drop - Step Sequencing'),
-        ('sentence_completion', 'Sentence Completion')
+        ('sentence_completion', 'Sentence Completion'),
+        ('matrix', 'Matrix Question')
     ], string='Type', default='mcq_single', required=True)
     
     # Text template for dropdown_blank type
@@ -45,6 +46,11 @@ class Question(models.Model):
     fill_blank_answer_ids = fields.One2many('quiz.fill.blank.answer', 'question_id', string='Fill Blank Answers')
     blank_ids = fields.One2many('quiz.blank', 'question_id', string='Dropdown Blanks')
     sequence_item_ids = fields.One2many('quiz.sequence.item', 'question_id', string='Sequence Items')
+    
+    # Matrix question fields
+    matrix_row_ids = fields.One2many('quiz.matrix.row', 'question_id', string='Matrix Rows')
+    matrix_column_ids = fields.One2many('quiz.matrix.column', 'question_id', string='Matrix Columns')
+    matrix_cell_ids = fields.One2many('quiz.matrix.cell', 'question_id', string='Matrix Cells')
     
     @api.depends('question_html', 'text_template', 'type')
     def _compute_name(self):
@@ -86,6 +92,11 @@ class Question(models.Model):
             elif question.type == 'step_sequence':
                 if not question.sequence_item_ids:
                     raise ValidationError(_('Step Sequencing questions must have sequence steps defined.'))
+            elif question.type == 'matrix':
+                if not question.matrix_row_ids:
+                    raise ValidationError(_('Matrix questions must have rows defined.'))
+                if not question.matrix_column_ids:
+                    raise ValidationError(_('Matrix questions must have columns defined.'))
     
     # This method will auto-fill question_html from text_template for dropdown_blank questions
     @api.onchange('text_template', 'type')
