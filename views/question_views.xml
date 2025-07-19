@@ -18,7 +18,7 @@
                             <field name="category_id" options="{'no_create_edit': True}"/>
                             <field name="access_mode" widget="radio"/>
                             <field name="allowed_group_ids" widget="many2many_tags" options="{'no_create': True}"
-                                   attrs="{'invisible': [('access_mode', '!=', 'internal')]}"/>
+                                   invisible="access_mode != 'internal'"/>
                         </group>
                     </group>
                     

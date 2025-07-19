@@ -21,7 +21,7 @@
                         <group>
                             <field name="access_mode" widget="radio"/>
                             <field name="group_ids" widget="many2many_tags" options="{'no_create': True}"
-                                   attrs="{'invisible': [('access_mode', '!=', 'internal')]}"/>
+                                   invisible="access_mode != 'internal'"/>
                         </group>
                     </group>
                     <field name="description" placeholder="Enter category description here"/>
@@ -75,9 +75,9 @@
             <form>
                 <header>
                     <button name="action_send_invitation" string="Send Invitation" type="object" 
-                            class="oe_highlight" states="draft"/>
+                            class="oe_highlight" invisible="state != 'draft'"/>
                     <button name="generate_new_token" string="Generate New Token" type="object"
-                            states="draft,sent,expired"/>
+                            invisible="state not in ('draft', 'sent', 'expired')"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,sent,used,expired"/>
                 </header>
                 <sheet>

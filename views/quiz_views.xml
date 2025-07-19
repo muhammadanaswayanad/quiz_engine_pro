@@ -87,7 +87,7 @@
                             <field name="allowed_category_ids" widget="many2many_tags"
                                    options="{'no_create': True}"
                                    domain="[('access_mode', '=', access_mode)]"
-                                   attrs="{'invisible': [('access_mode', '=', 'public')]}"/>
+                                   invisible="access_mode == 'public'"/>
                         </group>
                     </group>
                     <notebook>
@@ -106,7 +106,7 @@
                                 </tree>
                             </field>
                         </page>
-                        <page string="Access Control" attrs="{'invisible': [('access_mode', '=', 'public')]}">
+                        <page string="Access Control" invisible="access_mode == 'public'">
                             <group>
                                 <group>
                                     <field name="invitation_ids" widget="many2many_tags" options="{'no_create': True}"/>
