@@ -98,7 +98,7 @@
     <record id="view_question_form_with_matrix" model="ir.ui.view">
         <field name="name">quiz.question.form.matrix</field>
         <field name="model">quiz.question</field>
-        <field name="inherit_id" ref="quiz_engine_pro.view_question_form"/>
+        <field name="inherit_id" ref="quiz_engine_pro.view_quiz_question_form"/>
         <field name="arch" type="xml">
             <notebook position="inside">
                 <page string="Matrix Configuration" attrs="{'invisible': [('type', '!=', 'matrix')]}">
