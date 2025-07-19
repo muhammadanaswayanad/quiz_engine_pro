@@ -1,7 +1,10 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 import re
-import logging
+impor    # Matrix Question Fields
+    matrix_row_ids = fields.One2many('quiz.matrix.row', 'question_id', string='Matrix Rows')
+    matrix_column_ids = fields.One2many('quiz.matrix.column', 'question_id', string='Matrix Columns')
+    matrix_cell_ids = fields.One2many('quiz.matrix.cell', 'question_id', string='Matrix Cells')ogging
 import json
 
 _logger = logging.getLogger(__name__)
@@ -20,6 +23,56 @@ class Question(models.Model):
     explanation = fields.Html(string='Explanation', sanitize=True,
                               help="Shown after answering the question")
     points = fields.Float(string='Points', default=1.0)
+    
+    def generate_matrix_cells(self):
+        """Generate the matrix cells based on rows and columns"""
+        self.ensure_one()
+        if self.type != 'matrix':
+            return False
+            
+        # Get all rows and columns
+        rows = self.matrix_row_ids
+        columns = self.matrix_column_ids
+        
+        if not rows or not columns:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'No Rows or Columns',
+                    'message': 'Please add at least one row and one column before generating the cell configuration.',
+                    'type': 'warning',
+                    'sticky': False,
+                }
+            }
+            
+        # Generate cells for each row-column combination
+        for row in rows:
+            for column in columns:
+                # Check if the cell already exists
+                cell = self.env['quiz.matrix.cell'].search([
+                    ('row_id', '=', row.id),
+                    ('column_id', '=', column.id)
+                ], limit=1)
+                
+                # Create the cell if it doesn't exist
+                if not cell:
+                    self.env['quiz.matrix.cell'].create({
+                        'row_id': row.id,
+                        'column_id': column.id,
+                        'is_correct': False
+                    })
+                    
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Cell Configuration Generated',
+                'message': 'Matrix cells have been generated. You can now configure which cells are correct.',
+                'type': 'success',
+                'sticky': False,
+            }
+        }
     
     # Question type selection
     type = fields.Selection([
@@ -277,10 +330,11 @@ class SequenceItem(models.Model):
     @api.model
     def _get_matrix_correct_value(self, row, col):
         """Get the correct value for a matrix cell"""
-        # Find the correct cell value from the matrix_cell_values model
+        # Find the correct cell value from the matrix_cell model
         cell = self.env['quiz.matrix.cell'].search([
             ('row_id', '=', row.id),
-            ('column_id', '=', col.id)
+            ('column_id', '=', col.id),
+            ('question_id', '=', self.id)
         ], limit=1)
         
         return cell.is_correct if cell else False
