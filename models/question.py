@@ -82,7 +82,8 @@ class Question(models.Model):
         ('dropdown_blank', 'Dropdown in Text'),
         ('step_sequence', 'Drag and Drop - Step Sequencing'),
         ('sentence_completion', 'Sentence Completion'),
-        ('matrix', 'Matrix Question')
+        ('matrix', 'Matrix Question'),
+        ('passage', 'Reading Passage with Questions')
     ], string='Type', default='mcq_single', required=True)
     
     # Text template for dropdown_blank type
@@ -101,6 +102,19 @@ class Question(models.Model):
     matrix_row_ids = fields.One2many('quiz.matrix.row', 'question_id', string='Matrix Rows')
     matrix_column_ids = fields.One2many('quiz.matrix.column', 'question_id', string='Matrix Columns')
     matrix_cell_ids = fields.One2many('quiz.matrix.cell', 'question_id', string='Matrix Cells')
+    
+    # Passage question fields
+    passage_ids = fields.One2many('quiz.passage', 'question_id', string='Reading Passages')
+    active_passage_id = fields.Many2one('quiz.passage', string='Selected Passage', compute='_compute_active_passage')
+    sub_question_ids = fields.One2many(related='active_passage_id.sub_question_ids', string='Sub Questions')
+    
+    @api.depends('passage_ids')
+    def _compute_active_passage(self):
+        for question in self:
+            if question.passage_ids:
+                question.active_passage_id = question.passage_ids[0]
+            else:
+                question.active_passage_id = False
     
     @api.depends('question_html', 'text_template', 'type')
     def _compute_name(self):
@@ -147,6 +161,9 @@ class Question(models.Model):
                     raise ValidationError(_('Matrix questions must have rows defined.'))
                 if not question.matrix_column_ids:
                     raise ValidationError(_('Matrix questions must have columns defined.'))
+            elif question.type == 'passage':
+                if not question.passage_ids:
+                    raise ValidationError(_('Reading Passage questions must have at least one passage defined.'))
     
     # This method will auto-fill question_html from text_template for dropdown_blank questions
     @api.onchange('text_template', 'type')

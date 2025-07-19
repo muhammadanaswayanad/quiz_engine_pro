@@ -48,3 +48,12 @@ access_quiz_sequence_step_public,quiz.sequence.step public,model_quiz_sequence_s
 access_quiz_matrix_row_public,quiz.matrix.row public,model_quiz_matrix_row,base.group_public,1,0,0,0
 access_quiz_matrix_column_public,quiz.matrix.column public,model_quiz_matrix_column,base.group_public,1,0,0,0
 access_quiz_matrix_cell_public,quiz.matrix.cell public,model_quiz_matrix_cell,base.group_public,1,0,0,0
+access_quiz_passage_user,quiz.passage user,model_quiz_passage,base.group_user,1,1,1,1
+access_quiz_passage_sub_question_user,quiz.passage.sub.question user,model_quiz_passage_sub_question,base.group_user,1,1,1,1
+access_quiz_passage_choice_user,quiz.passage.choice user,model_quiz_passage_choice,base.group_user,1,1,1,1
+access_quiz_passage_master,quiz.passage master,model_quiz_passage,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_passage_sub_question_master,quiz.passage.sub.question master,model_quiz_passage_sub_question,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_passage_choice_master,quiz.passage.choice master,model_quiz_passage_choice,quiz_engine_pro.group_quiz_master,1,1,1,1
+access_quiz_passage_public,quiz.passage public,model_quiz_passage,base.group_public,1,0,0,0
+access_quiz_passage_sub_question_public,quiz.passage.sub.question public,model_quiz_passage_sub_question,base.group_public,1,0,0,0
+access_quiz_passage_choice_public,quiz.passage.choice public,model_quiz_passage_choice,base.group_public,1,0,0,0

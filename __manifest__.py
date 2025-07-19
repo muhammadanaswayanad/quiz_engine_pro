@@ -29,6 +29,7 @@
         'views/sentence_completion_template.xml',
         'views/admin_views_enhanced.xml',
         'views/matrix_views.xml',
+        'views/passage_views.xml',
     ],
     'assets': {
         'web.assets_backend': [
@@ -47,10 +48,12 @@
             'quiz_engine_pro/static/src/css/quiz_matrix.css',
             'quiz_engine_pro/static/src/css/quiz_fill_blanks.css',
             'quiz_engine_pro/static/src/css/quiz_sentence_completion.css',
+            'quiz_engine_pro/static/src/css/quiz_passage.css',
             # Enhanced JavaScript
             'quiz_engine_pro/static/src/js/quiz_enhanced_interaction.js',
             'quiz_engine_pro/static/src/js/quiz_fill_blanks.js',
             'quiz_engine_pro/static/src/js/quiz_sentence_completion.js',
+            'quiz_engine_pro/static/src/js/quiz_passage.js',
             # Original JS files (keep for compatibility)
             'quiz_engine_pro/static/src/js/sequence_buttons.js',
         ],

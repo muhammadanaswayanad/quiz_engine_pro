@@ -26,6 +26,8 @@ class QuestionEvaluation(models.Model):
             return self._evaluate_matrix(answer_data)
         elif self.type == 'dropdown_blank':
             return self._evaluate_dropdown_blank(answer_data)
+        elif self.type == 'passage':
+            return self._evaluate_passage(answer_data)
         return 0.0
 
     def _evaluate_mcq_single(self, answer_data):
@@ -291,3 +293,105 @@ class QuestionEvaluation(models.Model):
                 correct_count += 1
                 
         return correct_count
+        
+    def _evaluate_passage(self, answer_data):
+        """Evaluate reading passage with multiple questions"""
+        if not answer_data:
+            return 0.0
+        
+        try:
+            answers = json.loads(answer_data) if isinstance(answer_data, str) else answer_data
+        except Exception:
+            return 0.0
+        
+        # Get all passages and sub-questions
+        if not self.passage_ids:
+            return 0.0
+            
+        passage = self.passage_ids[0]  # Currently supporting one passage per question
+        sub_questions = passage.sub_question_ids
+        
+        if not sub_questions:
+            return 0.0
+        
+        # Calculate total possible points from all sub-questions
+        total_points = sum(q.points for q in sub_questions)
+        if total_points == 0:
+            return 0.0
+        
+        # Calculate earned points
+        earned_points = 0.0
+        
+        for sub_q in sub_questions:
+            sub_q_id = str(sub_q.id)
+            if sub_q_id not in answers:
+                continue
+                
+            sub_answer = answers[sub_q_id]
+            
+            # Evaluate based on sub-question type
+            if sub_q.question_type == 'mcq_single':
+                earned_points += self._evaluate_passage_mcq_single(sub_q, sub_answer)
+            elif sub_q.question_type == 'mcq_multiple':
+                earned_points += self._evaluate_passage_mcq_multiple(sub_q, sub_answer)
+            elif sub_q.question_type in ['text_short', 'text_long']:
+                earned_points += self._evaluate_passage_text(sub_q, sub_answer)
+        
+        # Scale the points to the question's total points
+        return (earned_points / total_points) * self.points
+    
+    def _evaluate_passage_mcq_single(self, sub_q, answer_data):
+        """Evaluate single choice MCQ within a passage"""
+        if not answer_data:
+            return 0.0
+        
+        selected_choice_id = int(answer_data)
+        correct_choice = sub_q.choice_ids.filtered('is_correct')
+        
+        if correct_choice and selected_choice_id == correct_choice[0].id:
+            return sub_q.points
+        return 0.0
+    
+    def _evaluate_passage_mcq_multiple(self, sub_q, answer_data):
+        """Evaluate multiple choice MCQ within a passage"""
+        if not answer_data:
+            return 0.0
+        
+        selected_ids = [int(x) for x in answer_data if x]
+        correct_ids = sub_q.choice_ids.filtered('is_correct').ids
+        
+        if set(selected_ids) == set(correct_ids):
+            return sub_q.points
+        return 0.0
+    
+    def _evaluate_passage_text(self, sub_q, answer_data):
+        """Evaluate text answer within a passage"""
+        if not answer_data or not sub_q.correct_answer:
+            return 0.0
+        
+        user_answer = answer_data.strip().lower()
+        correct_answer = sub_q.correct_answer.strip().lower()
+        
+        # For short answers, check for exact match or keyword presence
+        if sub_q.question_type == 'text_short':
+            if user_answer == correct_answer:
+                return sub_q.points
+                
+            # Check for keywords
+            keywords = [k.strip().lower() for k in correct_answer.split(',')]
+            for keyword in keywords:
+                if keyword in user_answer:
+                    return sub_q.points
+        
+        # For long answers, do a more lenient check based on keyword presence
+        elif sub_q.question_type == 'text_long':
+            keywords = [k.strip().lower() for k in correct_answer.split(',')]
+            if not keywords:
+                return 0.0
+                
+            # Calculate how many keywords are present
+            keywords_found = sum(1 for k in keywords if k in user_answer)
+            if keywords_found > 0:
+                return (keywords_found / len(keywords)) * sub_q.points
+        
+        return 0.0

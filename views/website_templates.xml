@@ -677,8 +677,114 @@
                                                 </div>
                                             </t>
 
+                                            <!-- Passage Question -->
+                                            <t t-if="question.type == 'passage'">
+                                                <div class="passage-question" data-passage-id="question.passage_ids[0].id if question.passage_ids else 0">
+                                                    <input type="hidden" name="answer_data" value="{}" />
+                                                    
+                                                    <div class="passage-container">
+                                                        <!-- Passage content -->
+                                                        <div class="passage-content">
+                                                            <h4><t t-esc="question.passage_ids[0].name if question.passage_ids else 'Reading Passage'"/></h4>
+                                                            <div t-raw="question.passage_ids[0].passage_content if question.passage_ids else ''" class="passage-text"></div>
+                                                        </div>
+                                                        
+                                                        <!-- Sub-questions container -->
+                                                        <div class="sub-questions-container" id="passage-question-form">
+                                                            <!-- Tabs for navigation -->
+                                                            <div class="passage-tabs">
+                                                                <t t-set="sub_index" t-value="0"/>
+                                                                <t t-foreach="question.passage_ids[0].sub_question_ids if question.passage_ids else []" t-as="sub_q">
+                                                                    <div class="passage-tab" t-att-data-question-index="sub_index">
+                                                                        Question <t t-esc="sub_index + 1"/>
+                                                                    </div>
+                                                                    <t t-set="sub_index" t-value="sub_index + 1"/>
+                                                                </t>
+                                                            </div>
+                                                            
+                                                            <!-- Sub-questions -->
+                                                            <div class="sub-questions">
+                                                                <t t-set="sub_index" t-value="0"/>
+                                                                <t t-foreach="question.passage_ids[0].sub_question_ids if question.passage_ids else []" t-as="sub_q">
+                                                                    <div class="sub-question" 
+                                                                         t-att-data-index="sub_index" 
+                                                                         t-att-data-question-id="sub_q.id" 
+                                                                         t-att-data-question-type="sub_q.question_type">
+                                                                        
+                                                                        <div class="sub-question-text" t-raw="sub_q.question_text"></div>
+                                                                        
+                                                                        <!-- Single choice question -->
+                                                                        <t t-if="sub_q.question_type == 'mcq_single'">
+                                                                            <div class="sub-question-choices">
+                                                                                <t t-foreach="sub_q.choice_ids" t-as="choice">
+                                                                                    <div class="form-check">
+                                                                                        <input type="radio" t-att-id="'choice_' + str(choice.id)"
+                                                                                               t-att-name="'sub_q_' + str(sub_q.id)"
+                                                                                               t-att-value="choice.id"
+                                                                                               class="form-check-input"/>
+                                                                                        <label class="form-check-label" t-att-for="'choice_' + str(choice.id)"
+                                                                                               t-esc="choice.text"></label>
+                                                                                    </div>
+                                                                                </t>
+                                                                            </div>
+                                                                        </t>
+                                                                        
+                                                                        <!-- Multiple choice question -->
+                                                                        <t t-if="sub_q.question_type == 'mcq_multiple'">
+                                                                            <div class="sub-question-choices">
+                                                                                <t t-foreach="sub_q.choice_ids" t-as="choice">
+                                                                                    <div class="form-check">
+                                                                                        <input type="checkbox" t-att-id="'choice_' + str(choice.id)"
+                                                                                               t-att-name="'sub_q_' + str(sub_q.id) + '[]'"
+                                                                                               t-att-value="choice.id"
+                                                                                               class="form-check-input"/>
+                                                                                        <label class="form-check-label" t-att-for="'choice_' + str(choice.id)"
+                                                                                               t-esc="choice.text"></label>
+                                                                                    </div>
+                                                                                </t>
+                                                                            </div>
+                                                                        </t>
+                                                                        
+                                                                        <!-- Short text answer -->
+                                                                        <t t-if="sub_q.question_type == 'text_short'">
+                                                                            <div class="form-group">
+                                                                                <textarea class="form-control" rows="2"
+                                                                                         t-att-name="'sub_q_' + str(sub_q.id)"
+                                                                                         placeholder="Enter your answer here..."></textarea>
+                                                                            </div>
+                                                                        </t>
+                                                                        
+                                                                        <!-- Long text answer -->
+                                                                        <t t-if="sub_q.question_type == 'text_long'">
+                                                                            <div class="form-group">
+                                                                                <textarea class="form-control" rows="5"
+                                                                                         t-att-name="'sub_q_' + str(sub_q.id)"
+                                                                                         placeholder="Enter your answer here..."></textarea>
+                                                                            </div>
+                                                                        </t>
+                                                                    </div>
+                                                                    <t t-set="sub_index" t-value="sub_index + 1"/>
+                                                                </t>
+                                                                
+                                                                <!-- Navigation buttons -->
+                                                                <div class="navigation-buttons mt-4">
+                                                                    <div class="d-flex justify-content-between">
+                                                                        <button type="button" class="btn btn-secondary prev-question-btn">
+                                                                            <i class="fa fa-arrow-left"></i> Previous Question
+                                                                        </button>
+                                                                        <button type="button" class="btn btn-primary next-question-btn">
+                                                                            Next Question <i class="fa fa-arrow-right"></i>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </t>
+                                            
                                             <!-- Default fallback for other question types -->
-                                            <t t-if="question.type not in ['mcq_single', 'mcq_multiple', 'fill_blank', 'dropdown_blank', 'drag_zone', 'drag_text', 'match', 'sentence_completion', 'step_sequence', 'matrix']">
+                                            <t t-if="question.type not in ['mcq_single', 'mcq_multiple', 'fill_blank', 'dropdown_blank', 'drag_zone', 'drag_text', 'match', 'sentence_completion', 'step_sequence', 'matrix', 'passage']">
                                                 <div class="alert alert-info">
                                                     <p>This question type (<t t-esc="question.type"/>) is not yet implemented in the frontend.</p>
                                                     <textarea name="answer_data" class="form-control" placeholder="Enter your answer here..."></textarea>
