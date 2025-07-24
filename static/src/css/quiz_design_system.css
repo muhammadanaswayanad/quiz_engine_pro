@@ -2,7 +2,7 @@
 /* ================================================= */
 
 /* Protection against dropdown interference */
-/* Ensure our styles don't interfere with Odoo's dropdown system */
+/* Only disable transforms that cause flickering, preserve positioning */
 .o_dropdown,
 .o_dropdown_menu,
 .dropdown,
@@ -17,11 +17,10 @@
 body .dropdown,
 body .o_dropdown {
     transform: none !important;
-    transition: none !important;
-    position: static !important;
+    /* Remove the position override that was causing layout issues */
 }
 
-/* Additional protection for dropdown elements */
+/* Only disable transforms on hover, not positioning */
 .o_dropdown *,
 .dropdown *,
 .o_form_view *,
@@ -30,26 +29,23 @@ body .o_dropdown {
 [class*="o_field"] *,
 .o_web_client * {
     transform: none !important;
-    transition: none !important;
+    /* Keep transitions for smooth operation, only remove transforms */
 }
 
-/* Only allow transforms in quiz containers - reset everything else */
+/* Only disable transforms on hover, preserve layout */
 *:not(.quiz-container *):hover {
     transform: none !important;
-}
-
-/* Scope quiz animations to quiz containers only */
-.quiz-container .quiz-choice:hover {
-    /* Only apply transforms inside quiz containers */
-    transform: translateX(4px);
+    /* Don't interfere with positioning or other layout properties */
 }
 
 /* Reset transforms for any element that might interfere with dropdowns */
+/* Only target transforms, not positioning or layout */
 .o_form_view *:hover,
 .o_list_view *:hover,
 .o_kanban_view *:hover,
 .o_dropdown *:hover {
     transform: none !important;
+    /* Preserve all other properties needed for proper layout */
 }
 
 /* CSS Variables for consistent theming */
@@ -235,12 +231,22 @@ body .o_dropdown {
     background: var(--quiz-white);
 }
 
-/* Scoped hover effects - only for quiz choices, not global dropdowns */
+/* Scoped hover effects - only for quiz choices within quiz containers */
 .quiz-container .quiz-choice:hover {
     border-color: var(--quiz-primary);
     background: var(--quiz-primary-light);
     /* Only apply transform inside quiz containers */
     transform: translateX(4px);
+}
+
+/* Reset transforms for any element that might interfere with dropdowns */
+/* Only target transforms, not positioning or layout */
+.o_form_view *:hover,
+.o_list_view *:hover,
+.o_kanban_view *:hover,
+.o_dropdown *:hover {
+    transform: none !important;
+    /* Preserve all other properties needed for proper layout */
 }
 
 .quiz-choice.selected {

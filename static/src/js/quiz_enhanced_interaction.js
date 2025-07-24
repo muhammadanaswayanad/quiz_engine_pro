@@ -41,22 +41,18 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
          * Add immediate protection before DOM is ready
          */
         addImmediateDropdownProtection: function() {
-            // Add protection CSS immediately
+            // Add minimal protection CSS - only target transforms
             const style = document.createElement('style');
             style.id = 'quiz-dropdown-protection';
             style.textContent = `
-                /* Immediate protection against dropdown interference */
-                .o_dropdown,
-                .o_dropdown_menu,
-                .dropdown,
-                .dropdown-menu,
+                /* Minimal protection - only disable transforms, preserve positioning */
+                .o_dropdown *:hover,
+                .dropdown *:hover,
                 .o_form_view *:hover,
                 .o_list_view *:hover,
                 .o_kanban_view *:hover,
-                [class*="o_field"] *:hover,
-                body .dropdown *:hover {
+                [class*="o_field"] *:hover {
                     transform: none !important;
-                    transition: none !important;
                 }
             `;
             
@@ -106,27 +102,21 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
          * Protect Odoo dropdowns from interference
          */
         protectOdooDropdowns: function() {
-            // Completely disable transforms on dropdown-related elements
+            // Minimal protection - only target transforms, preserve positioning
             const style = document.createElement('style');
             style.textContent = `
-                .o_dropdown,
-                .o_dropdown_menu,
-                .dropdown,
-                .dropdown-menu,
-                .o_form_view *,
-                .o_list_view *,
-                .o_kanban_view *,
-                .o_field_many2one *,
-                .o_field_selection *,
-                .o_field_many2many *,
-                body .dropdown * {
+                .o_dropdown *:hover,
+                .dropdown *:hover,
+                .o_form_view *:hover,
+                .o_list_view *:hover,
+                .o_kanban_view *:hover,
+                [class*="o_field"] *:hover {
                     transform: none !important;
-                    transition: none !important;
                 }
             `;
             document.head.appendChild(style);
             
-            // Add event listener to prevent our hover effects on Odoo dropdowns
+            // Only remove transforms, don't touch positioning
             document.addEventListener('mouseover', function(e) {
                 const target = e.target;
                 if (target.closest('.o_dropdown') || 
@@ -135,42 +125,26 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
                     target.closest('.o_list_view') ||
                     target.closest('.o_kanban_view') ||
                     target.closest('[class*="o_field"]')) {
-                    // Remove any transforms that might interfere
+                    // Only remove transform property, leave everything else
                     if (target.style.transform) {
-                        target.style.transform = '';
-                    }
-                    // Also check parent elements
-                    let parent = target.parentElement;
-                    while (parent) {
-                        if (parent.style && parent.style.transform) {
-                            parent.style.transform = '';
-                        }
-                        parent = parent.parentElement;
-                        if (parent && parent.tagName === 'BODY') break;
+                        target.style.transform = 'none';
                     }
                 }
             });
             
-            // Monitor for dynamically added dropdowns
+            // Monitor for dynamically added dropdowns - minimal intervention
             if (window.MutationObserver) {
                 const observer = new MutationObserver(function(mutations) {
                     mutations.forEach(function(mutation) {
                         mutation.addedNodes.forEach(function(node) {
-                            if (node.nodeType === 1) { // Element node
-                                if (node.classList && (
-                                    node.classList.contains('dropdown') ||
-                                    node.classList.contains('o_dropdown') ||
-                                    node.querySelector('.dropdown') ||
-                                    node.querySelector('.o_dropdown')
-                                )) {
-                                    // Disable transforms on newly added dropdowns
-                                    node.style.transform = 'none';
-                                    node.style.transition = 'none';
-                                    const dropdownElements = node.querySelectorAll('.dropdown, .o_dropdown, .dropdown-menu, .o_dropdown_menu');
-                                    dropdownElements.forEach(function(elem) {
-                                        elem.style.transform = 'none';
-                                        elem.style.transition = 'none';
-                                    });
+                            if (node.nodeType === 1 && node.classList && (
+                                node.classList.contains('dropdown') ||
+                                node.classList.contains('o_dropdown')
+                            )) {
+                                // Only disable transform, preserve all other styling
+                                const style = node.style;
+                                if (style.transform && style.transform !== 'none') {
+                                    style.transform = 'none';
                                 }
                             }
                         });
@@ -858,9 +832,9 @@ if (typeof odoo === 'undefined') {
     (function() {
         const style = document.createElement('style');
         style.textContent = `
-            .o_dropdown, .dropdown, .o_form_view *, .o_list_view *, .o_kanban_view * {
+            /* Minimal protection - only disable transforms on hover */
+            .o_dropdown *:hover, .dropdown *:hover, .o_form_view *:hover, .o_list_view *:hover {
                 transform: none !important;
-                transition: none !important;
             }
         `;
         if (document.head) {
