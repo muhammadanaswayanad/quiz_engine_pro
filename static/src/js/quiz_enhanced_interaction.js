@@ -24,6 +24,9 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
         init: function() {
             if (this.initialized) return;
             
+            // Add immediate protection for dropdowns
+            this.addImmediateDropdownProtection();
+            
             // Wait for DOM to be ready
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', this.initializeComponents.bind(this));
@@ -35,10 +38,51 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
         },
         
         /**
+         * Add immediate protection before DOM is ready
+         */
+        addImmediateDropdownProtection: function() {
+            // Add protection CSS immediately
+            const style = document.createElement('style');
+            style.id = 'quiz-dropdown-protection';
+            style.textContent = `
+                /* Immediate protection against dropdown interference */
+                .o_dropdown,
+                .o_dropdown_menu,
+                .dropdown,
+                .dropdown-menu,
+                .o_form_view *:hover,
+                .o_list_view *:hover,
+                .o_kanban_view *:hover,
+                [class*="o_field"] *:hover,
+                body .dropdown *:hover {
+                    transform: none !important;
+                    transition: none !important;
+                }
+            `;
+            
+            // Add to head immediately, even if DOM isn't ready
+            if (document.head) {
+                document.head.appendChild(style);
+            } else {
+                // If head doesn't exist yet, add when it does
+                const observer = new MutationObserver(function(mutations) {
+                    if (document.head) {
+                        document.head.appendChild(style);
+                        observer.disconnect();
+                    }
+                });
+                observer.observe(document, { childList: true, subtree: true });
+            }
+        },
+        
+        /**
          * Initialize all quiz components
          */
         initializeComponents: function() {
             console.log('Initializing Quiz Engine Pro interactions...');
+            
+            // Add protection against dropdown interference
+            this.protectOdooDropdowns();
             
             // Initialize different question types
             this.initializeMultipleChoice();
@@ -56,6 +100,88 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
             this.initializeKeyboardShortcuts();
             
             console.log('Quiz Engine Pro interactions initialized successfully');
+        },
+        
+        /**
+         * Protect Odoo dropdowns from interference
+         */
+        protectOdooDropdowns: function() {
+            // Completely disable transforms on dropdown-related elements
+            const style = document.createElement('style');
+            style.textContent = `
+                .o_dropdown,
+                .o_dropdown_menu,
+                .dropdown,
+                .dropdown-menu,
+                .o_form_view *,
+                .o_list_view *,
+                .o_kanban_view *,
+                .o_field_many2one *,
+                .o_field_selection *,
+                .o_field_many2many *,
+                body .dropdown * {
+                    transform: none !important;
+                    transition: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add event listener to prevent our hover effects on Odoo dropdowns
+            document.addEventListener('mouseover', function(e) {
+                const target = e.target;
+                if (target.closest('.o_dropdown') || 
+                    target.closest('.dropdown') ||
+                    target.closest('.o_form_view') ||
+                    target.closest('.o_list_view') ||
+                    target.closest('.o_kanban_view') ||
+                    target.closest('[class*="o_field"]')) {
+                    // Remove any transforms that might interfere
+                    if (target.style.transform) {
+                        target.style.transform = '';
+                    }
+                    // Also check parent elements
+                    let parent = target.parentElement;
+                    while (parent) {
+                        if (parent.style && parent.style.transform) {
+                            parent.style.transform = '';
+                        }
+                        parent = parent.parentElement;
+                        if (parent && parent.tagName === 'BODY') break;
+                    }
+                }
+            });
+            
+            // Monitor for dynamically added dropdowns
+            if (window.MutationObserver) {
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1) { // Element node
+                                if (node.classList && (
+                                    node.classList.contains('dropdown') ||
+                                    node.classList.contains('o_dropdown') ||
+                                    node.querySelector('.dropdown') ||
+                                    node.querySelector('.o_dropdown')
+                                )) {
+                                    // Disable transforms on newly added dropdowns
+                                    node.style.transform = 'none';
+                                    node.style.transition = 'none';
+                                    const dropdownElements = node.querySelectorAll('.dropdown, .o_dropdown, .dropdown-menu, .o_dropdown_menu');
+                                    dropdownElements.forEach(function(elem) {
+                                        elem.style.transform = 'none';
+                                        elem.style.transition = 'none';
+                                    });
+                                }
+                            }
+                        });
+                    });
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
         },
         
         /**
@@ -587,16 +713,12 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
         },
         
         /**
-         * Add hover effects
+         * Add hover effects (completely disabled for dropdown compatibility)
          */
         addHoverEffects: function(element) {
-            element.addEventListener('mouseenter', () => {
-                element.style.transform = 'translateX(4px)';
-            });
-            
-            element.addEventListener('mouseleave', () => {
-                element.style.transform = 'translateX(0)';
-            });
+            // Completely disable hover effects to prevent dropdown interference
+            // CSS-only hover effects are safer and don't interfere with positioning
+            return;
         },
         
         /**
@@ -732,6 +854,24 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
 
 // Initialize immediately for backward compatibility
 if (typeof odoo === 'undefined') {
+    // Add immediate dropdown protection
+    (function() {
+        const style = document.createElement('style');
+        style.textContent = `
+            .o_dropdown, .dropdown, .o_form_view *, .o_list_view *, .o_kanban_view * {
+                transform: none !important;
+                transition: none !important;
+            }
+        `;
+        if (document.head) {
+            document.head.appendChild(style);
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                document.head.appendChild(style);
+            });
+        }
+    })();
+    
     // Fallback for when Odoo framework is not available
     document.addEventListener('DOMContentLoaded', function() {
         console.log('Quiz Engine Pro: Odoo framework not available, using fallback initialization');

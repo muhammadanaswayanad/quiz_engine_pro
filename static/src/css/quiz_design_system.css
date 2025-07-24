@@ -1,6 +1,57 @@
 /* Quiz Engine Pro - Enhanced Design System */
 /* ================================================= */
 
+/* Protection against dropdown interference */
+/* Ensure our styles don't interfere with Odoo's dropdown system */
+.o_dropdown,
+.o_dropdown_menu,
+.dropdown,
+.dropdown-menu,
+.o_form_view .dropdown,
+.o_list_view .dropdown,
+.o_kanban_view .dropdown,
+.o_field_many2one .dropdown,
+.o_field_selection .dropdown,
+.o_field_many2many .dropdown,
+.o_field_many2many_tags .dropdown,
+body .dropdown,
+body .o_dropdown {
+    transform: none !important;
+    transition: none !important;
+    position: static !important;
+}
+
+/* Additional protection for dropdown elements */
+.o_dropdown *,
+.dropdown *,
+.o_form_view *,
+.o_list_view *,
+.o_kanban_view *,
+[class*="o_field"] *,
+.o_web_client * {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Only allow transforms in quiz containers - reset everything else */
+*:not(.quiz-container *):hover {
+    transform: none !important;
+}
+
+/* Scope quiz animations to quiz containers only */
+.quiz-container .quiz-choice:hover {
+    /* Only apply transforms inside quiz containers */
+    transform: translateX(4px);
+}
+
+/* Reset transforms for any element that might interfere with dropdowns */
+.o_form_view *:hover,
+.o_list_view *:hover,
+.o_kanban_view *:hover,
+.o_dropdown *:hover {
+    transform: none !important;
+}
+
 /* CSS Variables for consistent theming */
 :root {
     /* Primary Colors */
@@ -184,9 +235,11 @@
     background: var(--quiz-white);
 }
 
-.quiz-choice:hover {
+/* Scoped hover effects - only for quiz choices, not global dropdowns */
+.quiz-container .quiz-choice:hover {
     border-color: var(--quiz-primary);
     background: var(--quiz-primary-light);
+    /* Only apply transform inside quiz containers */
     transform: translateX(4px);
 }
 
