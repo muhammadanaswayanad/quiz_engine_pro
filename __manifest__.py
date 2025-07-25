@@ -37,6 +37,7 @@
     'assets': {
         'web.assets_backend': [
             'quiz_engine_pro/static/src/css/quiz_design_system.css',
+            'quiz_engine_pro/static/src/js/quiz_enhanced_interaction.js',
             # Temporarily disabled due to Odoo 17 compatibility issues
             # 'quiz_engine_pro/static/src/js/question_editor.js',
             # 'quiz_engine_pro/static/src/xml/question_editor_templates.xml',

@@ -41,17 +41,12 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
          * Add immediate protection before DOM is ready
          */
         addImmediateDropdownProtection: function() {
-            // Add minimal protection CSS - only target transforms
+            // Minimal protection - only for quiz elements that might interfere
             const style = document.createElement('style');
             style.id = 'quiz-dropdown-protection';
             style.textContent = `
-                /* Minimal protection - only disable transforms, preserve positioning */
-                .o_dropdown *:hover,
-                .dropdown *:hover,
-                .o_form_view *:hover,
-                .o_list_view *:hover,
-                .o_kanban_view *:hover,
-                [class*="o_field"] *:hover {
+                /* Only target quiz elements that might interfere with dropdowns */
+                .quiz-choice:not(.quiz-container .quiz-choice):hover {
                     transform: none !important;
                 }
             `;
@@ -99,63 +94,24 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
         },
         
         /**
-         * Protect Odoo dropdowns from interference
+         * Protect Odoo dropdowns from interference - MINIMAL approach
          */
         protectOdooDropdowns: function() {
-            // Minimal protection - only target transforms, preserve positioning
-            const style = document.createElement('style');
-            style.textContent = `
-                .o_dropdown *:hover,
-                .dropdown *:hover,
-                .o_form_view *:hover,
-                .o_list_view *:hover,
-                .o_kanban_view *:hover,
-                [class*="o_field"] *:hover {
-                    transform: none !important;
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Only remove transforms, don't touch positioning
+            // Only target quiz elements, don't interfere with general Odoo UI
             document.addEventListener('mouseover', function(e) {
                 const target = e.target;
-                if (target.closest('.o_dropdown') || 
-                    target.closest('.dropdown') ||
-                    target.closest('.o_form_view') ||
-                    target.closest('.o_list_view') ||
-                    target.closest('.o_kanban_view') ||
-                    target.closest('[class*="o_field"]')) {
-                    // Only remove transform property, leave everything else
+                // Only intervene if it's a quiz choice outside quiz container causing issues
+                if (target.classList.contains('quiz-choice') && 
+                    !target.closest('.quiz-container') &&
+                    (target.closest('.o_dropdown') || target.closest('.dropdown'))) {
+                    // Only remove transform if it's a quiz element in a dropdown context
                     if (target.style.transform) {
                         target.style.transform = 'none';
                     }
                 }
             });
             
-            // Monitor for dynamically added dropdowns - minimal intervention
-            if (window.MutationObserver) {
-                const observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        mutation.addedNodes.forEach(function(node) {
-                            if (node.nodeType === 1 && node.classList && (
-                                node.classList.contains('dropdown') ||
-                                node.classList.contains('o_dropdown')
-                            )) {
-                                // Only disable transform, preserve all other styling
-                                const style = node.style;
-                                if (style.transform && style.transform !== 'none') {
-                                    style.transform = 'none';
-                                }
-                            }
-                        });
-                    });
-                });
-                
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-            }
+            // Remove all other interventions that break Odoo functionality
         },
         
         /**
@@ -828,22 +784,10 @@ odoo.define('quiz_engine_pro.enhanced_interaction', [
 
 // Initialize immediately for backward compatibility
 if (typeof odoo === 'undefined') {
-    // Add immediate dropdown protection
+    // Minimal immediate protection - only if absolutely necessary
     (function() {
-        const style = document.createElement('style');
-        style.textContent = `
-            /* Minimal protection - only disable transforms on hover */
-            .o_dropdown *:hover, .dropdown *:hover, .o_form_view *:hover, .o_list_view *:hover {
-                transform: none !important;
-            }
-        `;
-        if (document.head) {
-            document.head.appendChild(style);
-        } else {
-            document.addEventListener('DOMContentLoaded', function() {
-                document.head.appendChild(style);
-            });
-        }
+        // Don't add any global styles that might break Odoo functionality
+        // Let the main initialization handle any needed protections
     })();
     
     // Fallback for when Odoo framework is not available
